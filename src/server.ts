@@ -1,10 +1,15 @@
-const express = require('express');
-const mongoose = require('mongoose');
-const colors = require('colors');
-const app = express();
-require('dotenv').config();
+import express = require('express');
+import mongoose = require('mongoose');
+import colors = require('colors');
 
-const port = process.env.PORT || 9950;
+require('dotenv').config();
+colors.enable();
+
+const app = express();
+const PORT = process.env.PORT || 9950;
+
+app.use(express.json());
+app.use('/auth', require('./routes/auth'));
 
 const start = async () => {
   try {
@@ -14,9 +19,9 @@ const start = async () => {
       authSource: 'admin'
     });
 
-    app.listen(port, () => console.log(colors.yellow(`Server has been started on port ${port}`)));
+    app.listen(PORT, () => console.log(`Server has been started on http://localhost:${PORT}`.yellow));
   } catch (error) {
-    console.log(colors.red('Error:', error.message));
+    console.log(`Error: ${error.message}`.red);
   }
 };
 
