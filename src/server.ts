@@ -1,6 +1,7 @@
 import express = require('express');
 import mongoose = require('mongoose');
 import colors = require('colors');
+import cors = require('cors');
 
 require('dotenv').config();
 colors.enable();
@@ -8,6 +9,7 @@ colors.enable();
 const app = express();
 const PORT = process.env.PORT || 9950;
 
+app.use(cors());
 app.use(express.json());
 app.use('/auth', require('./routes/auth'));
 
