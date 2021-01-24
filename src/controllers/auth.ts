@@ -1,6 +1,5 @@
 import Express = require('express');
 import Bcrypt = require('bcrypt');
-import Sha = require('js-sha512');
 import Jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
@@ -13,7 +12,8 @@ exports.registration = async (req: Express.Request, res: Express.Response) => {
     return res.status(400).json({ error: 'USER_EXIST' });
   }
 
-  const password = Bcrypt.hashSync(regPwd, process.env.BCRYPT_SALT_ROUNDS);
+  const bcryptSaltRounds = 5;
+  const password = Bcrypt.hashSync(regPwd, bcryptSaltRounds);
   const newUser = new User({ login: regLogin, password, avatar });
 
   await newUser.save();
@@ -29,8 +29,7 @@ exports.auth = async (req: Express.Request, res: Express.Response) => {
     return res.status(401).json({ error: 'AUTH_FAILED' });
   }
 
-  const passwordHash = Sha.sha512(authPwd);
-  const isPasswordMatch = await Bcrypt.compare(passwordHash, user.password);
+  const isPasswordMatch = await Bcrypt.compare(authPwd, user.password);
 
   if (!isPasswordMatch) {
     return res.status(401).json({ error: 'AUTH_FAILED' });
@@ -42,5 +41,11 @@ exports.auth = async (req: Express.Request, res: Express.Response) => {
     { expiresIn: '1d' }
   );
 
-  res.status(200).json(token);
+  res.status(200).json({
+    payload: {
+      token,
+      username: user.login,
+      avatar: user.avatar
+    }
+  });
 };
