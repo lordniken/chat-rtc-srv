@@ -11,16 +11,16 @@
   },
   "dependencies": {
     "@types/bcrypt": "^3.0.0",
+    "@types/express-ws": "^3.0.0",
     "@types/mongoose": "^5.10.3",
-    "@types/ws": "^7.4.0",
     "bcrypt": "^5.0.0",
     "colors": "^1.4.0",
     "cors": "^2.8.5",
     "express": "^4.17.1",
     "express-validator": "^6.9.2",
+    "express-ws": "^4.0.0",
     "jsonwebtoken": "^8.5.1",
-    "mongoose": "^5.11.13",
-    "ws": "^7.4.2"
+    "mongoose": "^5.11.13"
   },
   "devDependencies": {
     "@types/colors": "^1.2.1",
