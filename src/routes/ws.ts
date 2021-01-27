@@ -1,10 +1,9 @@
 import express = require('express');
 const router = express.Router();
+const wsTokenMiddleware = require('../middlewares/wsToken');
 
-router.ws('/', (ws) => {
-  ws.on('message', (msg) => {
-    console.log(msg);
-  });
+router.ws('/', wsTokenMiddleware, (ws, req) => {
+  console.log(req.query.type);
 });
 
 module.exports = router;

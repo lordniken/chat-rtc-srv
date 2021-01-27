@@ -15,6 +15,11 @@ app.use(express.json());
 app.use('/auth', require('./routes/auth'));
 app.use(require('./routes/ws'));
 
+app.param('world', function (req: any, res, next, world) {
+  req.world = world || 'world';
+  return next();
+});
+
 const start = async () => {
   try {
     await mongoose.connect(`mongodb://${process.env.DB_USER}:${process.env.DB_PWD}@${process.env.DB_HOST}`, {
