@@ -51,12 +51,16 @@ exports.auth = async (req: Request, res: Response) => {
 };
 
 exports.verify = async (req: Request, res: Response) => {
-  const { avatar, username } = await User.findOne({ _id: req.headers.userId });
+  try {
+    const { avatar, username } = await User.findOne({ _id: req.headers.userId });
 
-  res.status(200).json({
-    payload: {
-      username,
-      avatar
-    }
-  });
+    res.status(200).json({
+      payload: {
+        username,
+        avatar
+      }
+    });
+  } catch (e) {
+    return res.status(401).json({ error: 'TOKEN_ERROR' });
+  }
 };

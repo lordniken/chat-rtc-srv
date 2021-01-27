@@ -1,7 +1,8 @@
-import express = require('express');
-import mongoose = require('mongoose');
-import colors = require('colors');
-import cors = require('cors');
+import * as express from 'express';
+import * as mongoose from 'mongoose';
+import * as colors from 'colors';
+import * as cors from 'cors';
+import * as ws from 'ws';
 
 require('dotenv').config();
 colors.enable();
@@ -21,7 +22,25 @@ const start = async () => {
       authSource: 'admin'
     });
 
-    app.listen(PORT, () => console.log(`Server has been started on http://localhost:${PORT}`.yellow));
+    const server = app.listen(PORT, () => console.log(`Server has been started on http://localhost:${PORT}`.yellow));
+
+    const wsServer = new ws.Server({ server });
+
+    wsServer.on('connection', ws => {
+      wsServer.clients.forEach(client => client.send('hello!'));
+
+      setInterval(() => {
+        ws.send(Math.random());
+      }, 3000);
+
+      ws.on('message', (message) => {
+        console.log('rec', message);
+      });
+
+      ws.on('close', () => {
+        console.log('disconnect');
+      });
+    });
   } catch (error) {
     console.log(`Error: ${error.message}`.red);
   }
