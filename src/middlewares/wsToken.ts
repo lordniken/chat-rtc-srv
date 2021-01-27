@@ -1,4 +1,5 @@
 import jwt = require('jsonwebtoken');
+const actions = require('../actions');
 
 module.exports = async (ws, req, next) => {
   ws.on('message', (msg) => {
@@ -16,7 +17,7 @@ module.exports = async (ws, req, next) => {
 
       return next();
     } catch (error) {
-      ws.send(JSON.stringify({ type: '@user/USER_EXIT' }));
+      ws.send(JSON.stringify(actions.exit));
       return ws.close();
     }
   });

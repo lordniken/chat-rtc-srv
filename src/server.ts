@@ -7,18 +7,14 @@ import * as expressWs from 'express-ws';
 require('dotenv').config();
 colors.enable();
 
-const { app } = expressWs(express());
+const { app, getWss } = expressWs(express());
+module.exports = getWss();
 const PORT = process.env.PORT || 9950;
 
 app.use(cors());
 app.use(express.json());
 app.use('/auth', require('./routes/auth'));
 app.use(require('./routes/ws'));
-
-app.param('world', function (req: any, res, next, world) {
-  req.world = world || 'world';
-  return next();
-});
 
 const start = async () => {
   try {
