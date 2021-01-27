@@ -1,5 +1,5 @@
 import jwt = require('jsonwebtoken');
-const actions = require('../actions');
+const actions = require('../utils/actions');
 
 module.exports = async (ws, req, next) => {
   ws.on('message', (msg) => {
@@ -14,6 +14,7 @@ module.exports = async (ws, req, next) => {
     try {
       const tokenInfo = jwt.verify(req.query.token, process.env.JWT_SECRET);
       req.query = { ...req.query, userId: tokenInfo.id };
+      ws.uid = tokenInfo.id;
 
       return next();
     } catch (error) {
