@@ -8,9 +8,13 @@ module.exports = async (ws) => {
 
     if (req) {
       switch (req.type) {
-        case '@WS/USER_LOGIN': onlineController.online(ws, req); break;
+        case '@WS/USER_LOGIN': onlineController.online(req); break;
         case '@WS/CHANGE_STATUS': statusController(ws, req); break;
       }
     }
+  });
+
+  ws.on('close', async () => {
+    onlineController.onDisconnect();
   });
 };

@@ -1,3 +1,4 @@
+import { setTimeout } from 'timers';
 import ws = require('ws');
 const wss = import('../server');
 const actions = require('../utils/actions');
@@ -5,6 +6,8 @@ const User = require('../models/User');
 const helpers = require('../utils/helpers');
 
 let onlineList = [];
+
+const ONLINE_FILL_TIMEOUT = 100;
 
 const sendOnlineList = async () => {
   onlineList.sort(helpers.sortCompare('username'));
@@ -25,21 +28,29 @@ const setUserStatus = (status: string, userId: string) => {
   sendOnlineList();
 };
 
-exports.online = async (ws, action) => {
-  const { username, avatar, status } = await User.findOne({ _id: action.userId });
-  onlineList.push({
-    id: action.userId,
-    avatar,
-    username,
-    status
-  });
+const onDisconnect = async () => {
+  onlineList = [];
 
-  sendOnlineList();
+  const { clients } = await wss as ws.Server;
 
-  ws.on('close', async () => {
-    onlineList = onlineList.filter(user => user.id !== ws.uid);
-    sendOnlineList();
-  });
+  clients.forEach(client => client.send(
+    JSON.stringify(actions.broadcast)
+  ));
+};
+
+exports.online = async (action) => {
+  const isUserAlreadyLogged = onlineList.find(user => user.id === action.userId);
+  if (!isUserAlreadyLogged) {
+    const { username, avatar, status } = await User.findOne({ _id: action.userId });
+    onlineList.push({
+      id: action.userId,
+      avatar,
+      username,
+      status
+    });
+  }
+  setTimeout(() => sendOnlineList(), ONLINE_FILL_TIMEOUT);
 };
 
 exports.setUserStatus = setUserStatus;
+exports.onDisconnect = onDisconnect;
