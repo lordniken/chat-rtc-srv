@@ -8,10 +8,10 @@ let onlineList = [];
 
 const sendOnlineList = async () => {
   onlineList.sort(helpers.sortCompare('username'));
-
   const payload = onlineList.map(({ id, ...rest }) => ({
     ...rest
   }));
+
   const { clients } = await wss as ws.Server;
 
   clients.forEach(client => client.send(
@@ -19,13 +19,19 @@ const sendOnlineList = async () => {
   ));
 };
 
-module.exports = async (ws, action) => {
-  const { username, avatar } = await User.findOne({ _id: action.userId });
+const setUserStatus = (status: string, userId: string) => {
+  const userIndex = onlineList.findIndex(user => user.id === userId);
+  onlineList[userIndex].status = status;
+  sendOnlineList();
+};
+
+exports.online = async (ws, action) => {
+  const { username, avatar, status } = await User.findOne({ _id: action.userId });
   onlineList.push({
     id: action.userId,
     avatar,
     username,
-    status: 'online'
+    status
   });
 
   sendOnlineList();
@@ -35,3 +41,5 @@ module.exports = async (ws, action) => {
     sendOnlineList();
   });
 };
+
+exports.setUserStatus = setUserStatus;

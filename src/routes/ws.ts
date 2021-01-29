@@ -1,12 +1,16 @@
-import express = require('express');
-const router = express.Router();
-const wsTokenMiddleware = require('../middlewares/wsToken');
 const onlineController = require('../controllers/online');
+const statusController = require('../controllers/status');
+const validateWsMessage = require('../validators/ws');
 
-router.ws('/', wsTokenMiddleware, async (ws, req) => {
-  switch (req.query.type) {
-    case 'NEW': onlineController(ws, req.query);
-  }
-});
+module.exports = async (ws) => {
+  ws.on('message', (msg) => {
+    const req = validateWsMessage(msg, ws);
 
-module.exports = router;
+    if (req) {
+      switch (req.type) {
+        case '@WS/USER_LOGIN': onlineController.online(ws, req); break;
+        case '@WS/CHANGE_STATUS': statusController(ws, req); break;
+      }
+    }
+  });
+};

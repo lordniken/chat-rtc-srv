@@ -14,7 +14,7 @@ exports.registration = async (req: Request, res: Response) => {
 
   const bcryptSaltRounds = 5;
   const password = Bcrypt.hashSync(regPwd, bcryptSaltRounds);
-  const newUser = new User({ username: regLogin, password, avatar });
+  const newUser = new User({ username: regLogin, password, avatar, status: 'online' });
 
   await newUser.save();
   res.status(201).json({ payload: 'USER_CREATED' });
@@ -45,19 +45,21 @@ exports.auth = async (req: Request, res: Response) => {
     payload: {
       token,
       username: user.username,
-      avatar: user.avatar
+      avatar: user.avatar,
+      status: user.status
     }
   });
 };
 
 exports.verify = async (req: Request, res: Response) => {
   try {
-    const { avatar, username } = await User.findOne({ _id: req.headers.userId });
+    const { avatar, username, status } = await User.findOne({ _id: req.headers.userId });
 
     res.status(200).json({
       payload: {
         username,
-        avatar
+        avatar,
+        status
       }
     });
   } catch (e) {
