@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import jwt = require('jsonwebtoken');
 
-module.exports = async (req: Request, res: Response, next: NextFunction) => {
+module.exports = (req: Request, res: Response, next: NextFunction) => {
   if (req.method === 'OPTIONS') {
     return next();
   }

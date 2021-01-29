@@ -35,6 +35,12 @@ exports.auth = async (req: Request, res: Response) => {
     return res.status(401).json({ error: 'AUTH_FAILED' });
   }
 
+  const OnlineList = require('../controllers/online');
+
+  if (OnlineList.multiple(user.username)) {
+    return res.status(403).json({ error: 'MULTIPLE' });
+  }
+
   const token = Jwt.sign(
     { id: user.id },
     process.env.JWT_SECRET,
@@ -54,6 +60,12 @@ exports.auth = async (req: Request, res: Response) => {
 exports.verify = async (req: Request, res: Response) => {
   try {
     const { avatar, username, status } = await User.findOne({ _id: req.headers.userId });
+
+    const OnlineList = require('../controllers/online');
+
+    if (OnlineList.multiple(username)) {
+      return res.status(403).json({ error: 'MULTIPLE' });
+    }
 
     res.status(200).json({
       payload: {

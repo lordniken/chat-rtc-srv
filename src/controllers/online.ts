@@ -7,7 +7,7 @@ const helpers = require('../utils/helpers');
 
 let onlineList = [];
 
-const ONLINE_FILL_TIMEOUT = 100;
+const ONLINE_FILL_TIMEOUT = 300;
 
 const sendOnlineList = async () => {
   onlineList.sort(helpers.sortCompare('username'));
@@ -17,7 +17,7 @@ const sendOnlineList = async () => {
 
   const { clients } = await wss as ws.Server;
 
-  clients.forEach(client => client.send(
+  clients?.forEach(client => client.send(
     JSON.stringify(actions.online(payload))
   ));
 };
@@ -33,14 +33,13 @@ const onDisconnect = async () => {
 
   const { clients } = await wss as ws.Server;
 
-  clients.forEach(client => client.send(
+  clients?.forEach(client => client.send(
     JSON.stringify(actions.broadcast)
   ));
 };
 
 exports.online = async (action) => {
-  const isUserAlreadyLogged = onlineList.find(user => user.id === action.userId);
-  if (!isUserAlreadyLogged) {
+  if (!checkMultiple(action.userId)) {
     const { username, avatar, status } = await User.findOne({ _id: action.userId });
     onlineList.push({
       id: action.userId,
@@ -49,8 +48,14 @@ exports.online = async (action) => {
       status
     });
   }
+
   setTimeout(() => sendOnlineList(), ONLINE_FILL_TIMEOUT);
 };
 
+const checkMultiple = (username: string) => {
+  return !!onlineList.find(user => user.username === username);
+};
+
+exports.multiple = checkMultiple;
 exports.setUserStatus = setUserStatus;
 exports.onDisconnect = onDisconnect;
