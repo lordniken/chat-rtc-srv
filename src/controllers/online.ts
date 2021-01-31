@@ -11,14 +11,10 @@ const ONLINE_FILL_TIMEOUT = 300;
 
 const sendOnlineList = async () => {
   onlineList.sort(helpers.sortCompare('username'));
-  const payload = onlineList.map(({ id, ...rest }) => ({
-    ...rest
-  }));
-
   const { clients } = await wss as ws.Server;
 
   clients?.forEach(client => client.send(
-    JSON.stringify(actions.online(payload))
+    JSON.stringify(actions.online(onlineList))
   ));
 };
 

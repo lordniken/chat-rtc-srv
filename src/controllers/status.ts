@@ -1,8 +1,9 @@
-const actions = require('../utils/actions');
 const online = require('./online');
 const User = require('../models/User');
 
 module.exports = async (ws, action) => {
+  const actions = require('../utils/actions');
+
   const user = await User.findOne({ _id: ws.uid });
   const newStatus = action.payload;
   user.status = newStatus;
