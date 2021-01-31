@@ -1,10 +1,7 @@
+import { EnchWebSocket } from '../types';
 import WebSocket = require('ws');
 import jwt = require('jsonwebtoken');
 const actions = require('../utils/actions');
-
-interface EnchWebSocket extends WebSocket {
-  uid: string;
-}
 
 module.exports = (msg: WebSocket.Data, ws: EnchWebSocket) => {
   let json;
