@@ -11,7 +11,8 @@ module.exports = async (ws) => {
       switch (req.type) {
         case '@WS/USER_LOGIN': onlineController.online(req); break;
         case '@user/CHANGE_STATUS': statusController(ws, req); break;
-        case '@chat/SEND_MESSAGE': messageController(ws, req); break;
+        case '@chat/SEND_MESSAGE': messageController.send(ws, req); break;
+        case '@chat/FETCH_MESSAGES': messageController.fetch(ws, req); break;
       }
     }
   });
