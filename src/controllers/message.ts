@@ -7,7 +7,7 @@ const helpers = require('../utils/helpers');
 exports.send = async (ws, action) => {
   const wss = import('../server');
 
-  const newMessage = new Message({ author: action.userId, ...action.payload });
+  const newMessage = new Message({ author: action.userId, type: 'message', ...action.payload });
   await newMessage.save();
 
   ws.send((JSON.stringify(actions.message(newMessage))));
