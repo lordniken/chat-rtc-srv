@@ -4,6 +4,17 @@ const Message = require('../models/Message');
 const actions = require('../utils/actions');
 const helpers = require('../utils/helpers');
 
+exports.sendMedia = async (action) => {
+  const wss = import('../server');
+
+  const { clients } = await wss as ws.Server;
+  clients?.forEach((client: EnchWebSocket) => {
+    if (client.uid === action.to || client.uid === action.author) {
+      client.send(JSON.stringify(actions.message(action)));
+    }
+  });
+};
+
 exports.send = async (ws, action) => {
   const wss = import('../server');
 

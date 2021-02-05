@@ -1,21 +1,33 @@
 import { MulterRequest } from '../types';
-import { Response } from 'express';
+import { Request, Response } from 'express';
 const Message = require('../models/Message');
+const MessageController = require('./message');
 
-module.exports = async (req: MulterRequest, res: Response) => {
+exports.send = async (req: MulterRequest, res: Response) => {
   const file = req.file;
-
-  if (!file) return res.status(400).json({ error: 'FILE_MISSED' });
-  if (file.size > process.env.MEDIA_MAX_SIZE) {
-    return res.status(400).json({ error: 'FILE_SIZE', maxAllowed: process.env.MEDIA_MAX_SIZE });
-  }
-  const allowedMimeTypes = process.env.MEDIA_MIMETYPES.split(',');
-  if (!allowedMimeTypes.includes(file.mimetype)) {
-    return res.status(400).json({ error: 'FILE_MIMETYPE', allowedTypes: process.env.MEDIA_MIMETYPES });
-  }
-
   const { to } = req.body;
-  const newMessage = new Message({ author: req.headers.userId, type: 'media', message: file.key, to });
+
+  const newMessage = new Message({
+    author: req.headers.userId,
+    type: 'media',
+    message: file.key,
+    to
+  });
   await newMessage.save();
+
   res.send();
+
+  MessageController.sendMedia(newMessage);
+};
+
+exports.get = async (req: Request, res: Response) => {
+  if (!req.query.id) return res.status(400).json({ error: 'MISSED_PARAMS' });
+
+  const request = require('request').defaults({ encoding: null });
+  request.get(`${process.env.AWS_HOST}/${req.query.id}`, function (_, { statusCode }, body) {
+    if (statusCode === 200) {
+      return res.send(body);
+    }
+    return res.status(statusCode).send();
+  });
 };
