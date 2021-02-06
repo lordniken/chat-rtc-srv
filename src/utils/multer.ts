@@ -14,7 +14,7 @@ const s3 = new aws.S3({
 });
 
 const MAX_MEDIA_SIZE = 3000000;
-const MIME_TYPES = ['image/png', 'image/jpeg'];
+const MIME_TYPES = ['image/png', 'image/jpeg', 'application/octet-stream'];
 
 module.exports = multer({
   storage: multerS3({

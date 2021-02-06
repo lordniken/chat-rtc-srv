@@ -3,13 +3,30 @@ import { Request, Response } from 'express';
 const Message = require('../models/Message');
 const MessageController = require('./message');
 
-exports.send = async (req: MulterRequest, res: Response) => {
+exports.image = async (req: MulterRequest, res: Response) => {
   const file = req.file;
   const { to } = req.body;
 
   const newMessage = new Message({
     author: req.headers.userId,
-    type: 'media',
+    type: 'image',
+    message: file.key,
+    to
+  });
+  await newMessage.save();
+
+  res.send();
+
+  MessageController.sendMedia(newMessage);
+};
+
+exports.voice = async (req: MulterRequest, res: Response) => {
+  const file = req.file;
+  const { to } = req.body;
+
+  const newMessage = new Message({
+    author: req.headers.userId,
+    type: 'voice',
     message: file.key,
     to
   });
